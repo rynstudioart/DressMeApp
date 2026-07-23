@@ -199,6 +199,83 @@
             document.getElementById('outfit-name').value = '';
             cancelOutfit();
         }
+   function generateOutfit() {
+
+    const selectedItems =
+        [...selectedIds]
+            .map(id =>
+                items().find(
+                    item =>
+                        item.__backendId === id
+                )
+            )
+            .filter(Boolean);
+
+
+    if (selectedItems.length === 0) {
+        return;
+    }
+
+
+    // Get selected file names
+    const selectedImages =
+        selectedItems.map(
+            item =>
+                item.image_url
+                    .split("/")
+                    .pop()
+                    .toLowerCase()
+        );
+
+
+    let generatedImage = "";
+
+
+    // DRESS 1 + BAG 1
+    if (
+        selectedImages.includes("dress1.png") &&
+        selectedImages.includes("bag1.png")
+    ) {
+
+        generatedImage =
+            "./outfit2.jpg";
+
+    }
+
+
+    // ONLY DRESS 1
+    else if (
+        selectedImages.includes("dress1.png")
+    ) {
+
+        generatedImage =
+            "./dress1.jpg";
+
+    }
+
+
+    // Show generated image
+    document
+        .getElementById("generated-image")
+        .src = generatedImage;
+
+
+    // Show outfit name
+    document
+        .getElementById("generated-name")
+        .textContent =
+            selectedItems
+                .map(item => item.name)
+                .join(" + ");
+
+
+    // Show generated outfit section
+    document
+        .getElementById("generated-outfit")
+        .classList
+        .remove("hidden");
+
+}
 
         function renderOutfits() {
             const list = outfits();
