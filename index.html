@@ -19,7 +19,19 @@
    <h1 data-template-id="app-title" class="canva-text text-center font-bold"></h1>
   </header>
   <nav class="flex justify-center gap-8 pt-4 border-b border-gray-100">
-   <button id="tab-wardrobe" class="canva-button pb-3 px-2 tab-active" data-template-id="tab-wardrobe-label" onclick="switchTab('wardrobe')"></button> <button id="tab-outfits" class="canva-button pb-3 px-2" data-template-id="tab-outfits-label" onclick="switchTab('outfits')"></button>
+   <button
+    id="tab-wardrobe"
+    class="pb-3 px-2 tab-active"
+    onclick="switchTab('wardrobe')">
+    Wardrobe
+</button>
+
+<button
+    id="tab-outfits"
+    class="pb-3 px-2"
+    onclick="switchTab('outfits')">
+    Outfits
+</button>
   </nav>
   <main class="max-w-4xl mx-auto p-4">
    <!-- WARDROBE VIEW -->
