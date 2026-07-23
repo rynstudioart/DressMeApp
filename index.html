@@ -87,7 +87,28 @@
             lucide.createIcons();
         })();
 
-        function items() { return allData.filter(d => d.type === 'item'); }
+        function items() {
+
+  const wardrobeItems = allData.filter(
+    d => d.type === "item"
+  );
+
+  // Adaugă automat rochia dress1.png
+  const defaultDress = {
+    __backendId: "default-dress-1",
+    type: "item",
+    name: "Dress 1",
+    category: "dress",
+    image_url: "dress1.png",
+    outfit_items: ""
+  };
+
+  return [
+    defaultDress,
+    ...wardrobeItems
+  ];
+
+}
         function outfits() { return allData.filter(d => d.type === 'outfit'); }
 
         function switchTab(tab) {
