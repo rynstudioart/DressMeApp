@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260723-05-e9a76f4"}');</script><script src="/_sdk/e358eac22bd01364.telemetry_sdk.js" integrity="sha512-KPxp3rw4K8Nu9ceWJc3gyM7srgaZxiFWOVbyu260EYzzAqdz10mfo5xyXrCx+wEKtGo77JbtmwXvFLbwrGzwvw=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dress Me</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .tab-active { border-bottom: 3px solid #1e293b; font-weight: 700; }
+        .item-selected { ring: 3px; outline: 3px solid #f59e0b; outline-offset: 2px; }
+    </style>
+  <script src="/_sdk/6030e540d4419216.resizing_sdk.js" type="text/javascript" integrity="sha512-b5KWzyoXsbWP4smq4sftIi6Kts4YVBpBsz0BwCViwbBJkK64a3/Z6ZMdWA+qnplNcXw4mhZeqvQi3mOosiRJdA=="></script>
+ </head>
+ <body data-template-id="__page-root" class="w-full min-h-screen">
+  <header class="p-5 border-b border-gray-200">
+   <h1 data-template-id="app-title" class="canva-text text-center font-bold"></h1>
+  </header>
+  <nav class="flex justify-center gap-8 pt-4 border-b border-gray-100"><button id="tab-wardrobe" class="canva-button pb-3 px-2 tab-active" data-template-id="tab-wardrobe-label" onclick="switchTab('wardrobe')"></button> <button id="tab-outfits" class="canva-button pb-3 px-2" data-template-id="tab-outfits-label" onclick="switchTab('outfits')"></button>
+  </nav>
+  <main class="max-w-4xl mx-auto p-4"><!-- WARDROBE VIEW -->
+   <section id="view-wardrobe">
+    <div class="flex flex-wrap items-center gap-2 my-4"><select id="cat-filter" class="border rounded px-3 py-2 text-sm" onchange="renderWardrobe()"> <option value="all">All</option> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <button onclick="toggleAddForm()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> Add Item</button>
+    </div>
+    <form id="add-form" class="hidden bg-gray-50 rounded-xl p-4 mb-4 space-y-3" onsubmit="addItem(event)"><label for="item-name" class="text-sm font-medium">Name</label> <input id="item-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm"> <label for="item-cat" class="text-sm font-medium">Category</label> <select id="item-cat" required class="w-full border rounded-lg px-3 py-2 text-sm"> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <label for="item-url" class="text-sm font-medium">Image URL (GitHub raw)</label> <input id="item-url" type="url" required placeholder="https://raw.githubusercontent.com/..." class="w-full border rounded-lg px-3 py-2 text-sm">
+     <div class="flex gap-2"><button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save</button> <button type="button" onclick="toggleAddForm()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
+     </div>
+    </form>
+    <div id="wardrobe-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+    <p id="wardrobe-empty" data-template-id="wardrobe-empty" class="canva-text text-center py-12 text-gray-400 hidden"></p>
+   </section><!-- OUTFITS VIEW -->
+   <section id="view-outfits" class="hidden">
+    <div class="flex items-center my-4"><button onclick="startOutfitCreation()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> New Outfit</button>
+    </div>
+    <div id="outfit-creator" class="hidden bg-amber-50 rounded-xl p-4 mb-4 space-y-3"><label for="outfit-name" class="text-sm font-medium">Outfit Name</label> <input id="outfit-name" type="text" readonly required class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="Select items to generate a name">
+     <p class="text-xs text-gray-500">Tap items below to select:</p>
+     <div id="outfit-picker" class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto"></div>
+     <div class="flex gap-2"><button onclick="saveOutfit()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save Outfit</button> <button onclick="cancelOutfit()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
+     </div>
+    </div>
+    <div id="outfits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    <p id="outfits-empty" data-template-id="outfits-empty" class="canva-text text-center py-12 text-gray-400 hidden"></p>
+   </section>
+  </main>
+  <script src="/_sdk/c939c145c3c74230.editing_sdk.js" integrity="sha512-jh2pv/gl9Gzzn5dxfzwQO4wkqtnAQIim+LIUDYfVu2cdqPkQV2MqbjsDUW5IYbrSZFjRlOBrIWzlvWDXQYxOjg=="></script>
+  <script src="/_sdk/935a53bc2e11fb8d.data_sdk.js" integrity="sha512-qr2oyPnEys1WebcOABaRh6hG77r5PWpqeWW6JTKbRJqly/INsfBi31CVNlTmHqjgeLpkVmmHZJUdxSx/32tOFQ=="></script>
+  <script>
+        let allData = [];
+        let selectedIds = new Set();
+        let creatingOutfit = false;
+
+        const handler = {
+            onDataChanged(data) {
+                allData = data;
+                renderWardrobe();
+                renderOutfits();
+            }
+        };
+
+        (async () => {
+            const r = await window.dataSdk.init(handler);
+            if (!r.isOk) console.error('SDK init failed');
+            lucide.createIcons();
+        })();
+
+        function items() { return allData.filter(d => d.type === 'item'); }
+        function outfits() { return allData.filter(d => d.type === 'outfit'); }
+
+        function switchTab(tab) {
+            document.getElementById('view-wardrobe').classList.toggle('hidden', tab !== 'wardrobe');
+            document.getElementById('view-outfits').classList.toggle('hidden', tab !== 'outfits');
+            document.getElementById('tab-wardrobe').classList.toggle('tab-active', tab === 'wardrobe');
+            document.getElementById('tab-outfits').classList.toggle('tab-active', tab === 'outfits');
+        }
+
+        function toggleAddForm() {
+            document.getElementById('add-form').classList.toggle('hidden');
+        }
+
+        async function addItem(e) {
+            e.preventDefault();
+            const name = document.getElementById('item-name').value.trim();
+            const category = document.getElementById('item-cat').value;
+            const image_url = document.getElementById('item-url').value.trim();
+            if (!name || !image_url) return;
+            const r = await window.dataSdk.create({ type: 'item', name, category, image_url, outfit_items: '' });
+            if (r.isOk) { e.target.reset(); toggleAddForm(); }
+        }
+
+        async function deleteRecord(rec) {
+            await window.dataSdk.delete(rec);
+        }
+
+        function renderWardrobe() {
+            const filter = document.getElementById('cat-filter').value;
+            const list = items().filter(i => filter === 'all' || i.category === filter);
+            const grid = document.getElementById('wardrobe-grid');
+            const empty = document.getElementById('wardrobe-empty');
+            empty.classList.toggle('hidden', list.length > 0);
+
+            grid.innerHTML = '';
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-xl overflow-hidden bg-white border group';
+                div.innerHTML = `
+                    <img src="${item.image_url}" alt="${item.name}" class="w-full aspect-square object-cover">
+                    <div class="p-2">
+                        <p class="text-xs font-medium truncate">${item.name}</p>
+                        <p class="text-[10px] text-gray-400 uppercase">${item.category}</p>
+                    </div>
+                    <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${item.__backendId}'))" class="absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
+                `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function startOutfitCreation() {
+            creatingOutfit = true;
+            selectedIds.clear();
+            updateOutfitName();
+            document.getElementById('outfit-creator').classList.remove('hidden');
+            renderPicker();
+        }
+        function cancelOutfit() {
+            creatingOutfit = false;
+            document.getElementById('outfit-creator').classList.add('hidden');
+        }
+
+        function updateOutfitName() {
+            const name = [...selectedIds].map(id => items().find(item => item.__backendId === id)?.name).filter(Boolean).join('');
+            document.getElementById('outfit-name').value = name;
+        }
+
+        function renderPicker() {
+            const picker = document.getElementById('outfit-picker');
+            picker.innerHTML = '';
+            items().forEach(item => {
+                const d = document.createElement('div');
+                const sel = selectedIds.has(item.__backendId);
+                d.className = `cursor-pointer rounded-lg overflow-hidden border-2 ${sel ? 'border-amber-500' : 'border-transparent'}`;
+                d.innerHTML = `<img src="${item.image_url}" alt="${item.name}" class="w-full aspect-square object-cover">`;
+                d.onclick = () => { selectedIds.has(item.__backendId) ? selectedIds.delete(item.__backendId) : selectedIds.add(item.__backendId); updateOutfitName(); renderPicker(); };
+                picker.appendChild(d);
+            });
+        }
+
+        async function saveOutfit() {
+            const name = document.getElementById('outfit-name').value.trim();
+            if (!name || selectedIds.size === 0) return;
+            await window.dataSdk.create({ type: 'outfit', name, category: '', image_url: '', outfit_items: [...selectedIds].join(',') });
+            document.getElementById('outfit-name').value = '';
+            cancelOutfit();
+        }
+
+        function renderOutfits() {
+            const list = outfits();
+            const grid = document.getElementById('outfits-grid');
+            const empty = document.getElementById('outfits-empty');
+            empty.classList.toggle('hidden', list.length > 0);
+            grid.innerHTML = '';
+            list.forEach(o => {
+                const ids = o.outfit_items ? o.outfit_items.split(',') : [];
+                const oItems = ids.map(id => allData.find(d => d.__backendId === id)).filter(Boolean);
+                const div = document.createElement('div');
+                div.className = 'bg-white border rounded-xl p-3 space-y-2 relative group';
+                div.innerHTML = `
+                    <p class="font-medium text-sm">${o.name}</p>
+                    <div class="flex gap-1 flex-wrap">${oItems.map(i => `<img src="${i.image_url}" alt="${i.name}" class="w-12 h-12 rounded object-cover">`).join('')}</div>
+                    <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${o.__backendId}'))" class="absolute top-2 right-2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
+                `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+    </script>
+ </body>
+</html>
