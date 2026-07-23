@@ -235,17 +235,88 @@
         }
 
         function renderPicker() {
-            const picker = document.getElementById('outfit-picker');
-            picker.innerHTML = '';
-            items().forEach(item => {
-                const d = document.createElement('div');
-                const sel = selectedIds.has(item.__backendId);
-                d.className = `cursor-pointer rounded-lg overflow-hidden border-2 ${sel ? 'border-amber-500' : 'border-transparent'}`;
-                d.innerHTML = `<img src="${item.image_url}" alt="${item.name}" class="w-full aspect-square object-cover">`;
-                d.onclick = () => { selectedIds.has(item.__backendId) ? selectedIds.delete(item.__backendId) : selectedIds.add(item.__backendId); updateOutfitName(); renderPicker(); };
-                picker.appendChild(d);
-            });
-        }
+
+    const picker =
+        document.getElementById('outfit-picker');
+
+    picker.innerHTML = '';
+
+    items().forEach(item => {
+
+        const d =
+            document.createElement('div');
+
+        const sel =
+            selectedIds.has(
+                item.__backendId
+            );
+
+        d.className =
+            `cursor-pointer rounded-lg overflow-hidden border-2 ${
+                sel
+                    ? 'border-amber-500'
+                    : 'border-transparent'
+            }`;
+
+        d.innerHTML = `
+            <img
+                src="${item.image_url}"
+                alt="${item.name}"
+                class="w-full aspect-square object-cover">
+        `;
+
+        d.onclick = () => {
+
+            if (
+                selectedIds.has(
+                    item.__backendId
+                )
+            ) {
+
+                selectedIds.delete(
+                    item.__backendId
+                );
+
+            } else {
+
+                selectedIds.add(
+                    item.__backendId
+                );
+
+            }
+
+            updateOutfitName();
+
+            renderPicker();
+
+            updateGenerateButton();
+
+        };
+
+        picker.appendChild(d);
+
+    });
+
+    updateGenerateButton();
+
+}
+
+   function updateGenerateButton() {
+
+    const button =
+        document.getElementById("generate-button");
+
+    if (selectedIds.size > 0) {
+
+        button.classList.remove("hidden");
+
+    } else {
+
+        button.classList.add("hidden");
+
+    }
+
+}
 
         async function saveOutfit() {
             const name = document.getElementById('outfit-name').value.trim();
