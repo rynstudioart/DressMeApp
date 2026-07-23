@@ -60,6 +60,12 @@
      <div id="outfit-picker" class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto"></div>
      <div class="flex gap-2">
       <button onclick="saveOutfit()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save Outfit</button> <button onclick="cancelOutfit()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
+      <button
+  id="generate-button"
+  onclick="generateOutfit()"
+  class="hidden w-full mt-3 bg-gray-900 text-white px-4 py-3 rounded-lg text-sm">
+  ✨ Generate Outfit
+</button>
      </div>
     </div>
     <div id="outfits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
