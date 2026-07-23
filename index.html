@@ -18,26 +18,34 @@
   <header class="p-5 border-b border-gray-200">
    <h1 data-template-id="app-title" class="canva-text text-center font-bold"></h1>
   </header>
-  <nav class="flex justify-center gap-8 pt-4 border-b border-gray-100"><button id="tab-wardrobe" class="canva-button pb-3 px-2 tab-active" data-template-id="tab-wardrobe-label" onclick="switchTab('wardrobe')"></button> <button id="tab-outfits" class="canva-button pb-3 px-2" data-template-id="tab-outfits-label" onclick="switchTab('outfits')"></button>
+  <nav class="flex justify-center gap-8 pt-4 border-b border-gray-100">
+   <button id="tab-wardrobe" class="canva-button pb-3 px-2 tab-active" data-template-id="tab-wardrobe-label" onclick="switchTab('wardrobe')"></button> <button id="tab-outfits" class="canva-button pb-3 px-2" data-template-id="tab-outfits-label" onclick="switchTab('outfits')"></button>
   </nav>
-  <main class="max-w-4xl mx-auto p-4"><!-- WARDROBE VIEW -->
+  <main class="max-w-4xl mx-auto p-4">
+   <!-- WARDROBE VIEW -->
    <section id="view-wardrobe">
-    <div class="flex flex-wrap items-center gap-2 my-4"><select id="cat-filter" class="border rounded px-3 py-2 text-sm" onchange="renderWardrobe()"> <option value="all">All</option> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <button onclick="toggleAddForm()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> Add Item</button>
+    <div class="flex flex-wrap items-center gap-2 my-4">
+     <select id="cat-filter" class="border rounded px-3 py-2 text-sm" onchange="renderWardrobe()"> <option value="all">All</option> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <button onclick="toggleAddForm()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> Add Item</button>
     </div>
-    <form id="add-form" class="hidden bg-gray-50 rounded-xl p-4 mb-4 space-y-3" onsubmit="addItem(event)"><label for="item-name" class="text-sm font-medium">Name</label> <input id="item-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm"> <label for="item-cat" class="text-sm font-medium">Category</label> <select id="item-cat" required class="w-full border rounded-lg px-3 py-2 text-sm"> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <label for="item-url" class="text-sm font-medium">Image URL (GitHub raw)</label> <input id="item-url" type="url" required placeholder="https://raw.githubusercontent.com/..." class="w-full border rounded-lg px-3 py-2 text-sm">
-     <div class="flex gap-2"><button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save</button> <button type="button" onclick="toggleAddForm()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
+    <form id="add-form" class="hidden bg-gray-50 rounded-xl p-4 mb-4 space-y-3" onsubmit="addItem(event)">
+     <label for="item-name" class="text-sm font-medium">Name</label> <input id="item-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm"> <label for="item-cat" class="text-sm font-medium">Category</label> <select id="item-cat" required class="w-full border rounded-lg px-3 py-2 text-sm"> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <label for="item-url" class="text-sm font-medium">Image URL (GitHub raw)</label> <input id="item-url" type="url" required placeholder="https://raw.githubusercontent.com/..." class="w-full border rounded-lg px-3 py-2 text-sm">
+     <div class="flex gap-2">
+      <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save</button> <button type="button" onclick="toggleAddForm()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
      </div>
     </form>
     <div id="wardrobe-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
     <p id="wardrobe-empty" data-template-id="wardrobe-empty" class="canva-text text-center py-12 text-gray-400 hidden"></p>
    </section><!-- OUTFITS VIEW -->
    <section id="view-outfits" class="hidden">
-    <div class="flex items-center my-4"><button onclick="startOutfitCreation()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> New Outfit</button>
+    <div class="flex items-center my-4">
+     <button onclick="startOutfitCreation()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> New Outfit</button>
     </div>
-    <div id="outfit-creator" class="hidden bg-amber-50 rounded-xl p-4 mb-4 space-y-3"><label for="outfit-name" class="text-sm font-medium">Outfit Name</label> <input id="outfit-name" type="text" readonly required class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="Select items to generate a name">
+    <div id="outfit-creator" class="hidden bg-amber-50 rounded-xl p-4 mb-4 space-y-3">
+     <label for="outfit-name" class="text-sm font-medium">Outfit Name</label> <input id="outfit-name" type="text" readonly required class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="Select items to generate a name">
      <p class="text-xs text-gray-500">Tap items below to select:</p>
      <div id="outfit-picker" class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto"></div>
-     <div class="flex gap-2"><button onclick="saveOutfit()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save Outfit</button> <button onclick="cancelOutfit()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
+     <div class="flex gap-2">
+      <button onclick="saveOutfit()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save Outfit</button> <button onclick="cancelOutfit()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
      </div>
     </div>
     <div id="outfits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
@@ -109,6 +117,7 @@
                     <div class="p-2">
                         <p class="text-xs font-medium truncate">${item.name}</p>
                         <p class="text-[10px] text-gray-400 uppercase">${item.category}</p>
+                        <p class="text-[10px] text-gray-500 truncate">${item.category === 'dress' ? 'dress1.jpg' : ''}</p>
                     </div>
                     <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${item.__backendId}'))" class="absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
                 `;
@@ -168,7 +177,7 @@
                 div.className = 'bg-white border rounded-xl p-3 space-y-2 relative group';
                 div.innerHTML = `
                     <p class="font-medium text-sm">${o.name}</p>
-                    <div class="flex gap-1 flex-wrap">${oItems.map(i => `<img src="${i.image_url}" alt="${i.name}" class="w-12 h-12 rounded object-cover">`).join('')}</div>
+                    <div class="flex gap-1 flex-wrap">${oItems.map(i => `<div class="text-center"><img src="${i.image_url}" alt="${i.name}" class="w-12 h-12 rounded object-cover"><span class="block text-[10px] text-gray-500">${i.category === 'dress' ? 'dress1.PNG' : ''}</span></div>`).join('')}</div>
                     <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${o.__backendId}'))" class="absolute top-2 right-2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
                 `;
                 grid.appendChild(div);
