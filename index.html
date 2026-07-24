@@ -107,18 +107,7 @@
   class="canva-text text-center py-12 text-gray-400 hidden">
 </p>
     
-    <p id="outfits-empty" data-template-id="outfits-empty" class="canva-text text-center py-12 text-gray-400 hidden"></p><div id="generated-outfit" class="hidden">
-
-    <h2>Generated Outfit</h2>
-
-    <img
-        id="generated-image"
-        src=""
-        alt="Generated Outfit">
-
-    <p id="generated-name"></p>
-
-</div>
+    
    </section>
   </main>
   <script src="/_sdk/c939c145c3c74230.editing_sdk.js" integrity="sha512-jh2pv/gl9Gzzn5dxfzwQO4wkqtnAQIim+LIUDYfVu2cdqPkQV2MqbjsDUW5IYbrSZFjRlOBrIWzlvWDXQYxOjg=="></script>
@@ -194,7 +183,12 @@
 
         function renderWardrobe() {
             const filter = document.getElementById('cat-filter').value;
-            const list = items().filter(i => filter === 'all' || i.category === filter);
+
+    const list = filter === 'all'
+
+        ? items()
+
+        : items().filter(i => i.category === filter);
             const grid = document.getElementById('wardrobe-grid');
             const empty = document.getElementById('wardrobe-empty');
             empty.classList.toggle('hidden', list.length > 0);
