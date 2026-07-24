@@ -59,6 +59,21 @@
    </section><!-- OUTFITS VIEW -->
    <section id="view-outfits" class="hidden">
     <div class="flex items-center my-4">
+     <button
+    onclick="document.getElementById('outfit-files').click()"
+    class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">
+
+    Upload Outfit Photos
+
+</button>
+
+<input
+    id="outfit-files"
+    type="file"
+    accept="image/*"
+    multiple
+    hidden
+    onchange="uploadOutfits(this.files)">
      <button onclick="startOutfitCreation()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> New Outfit</button>
     </div>
     <div id="outfit-creator" class="hidden bg-amber-50 rounded-xl p-4 mb-4 space-y-3">
