@@ -233,6 +233,40 @@ function saveWardrobeItem(item) {
     store.put(item);
 
 }
+   function deleteWardrobeItem(id) {
+
+    if (!confirm("Delete this item?")) {
+        return;
+    }
+
+    const transaction =
+        db.transaction(
+            ["wardrobe"],
+            "readwrite"
+        );
+
+    const store =
+        transaction.objectStore(
+            "wardrobe"
+        );
+
+    const request =
+        store.delete(id);
+
+    request.onsuccess = function() {
+
+        allData =
+            allData.filter(
+                item =>
+                    item.id !== id &&
+                    item.__backendId !== id
+            );
+
+        renderWardrobe();
+
+    };
+
+}
 
 
 // ===============================
