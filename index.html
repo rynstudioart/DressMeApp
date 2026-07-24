@@ -522,20 +522,103 @@ request.onerror = function() {
 
 }
 
-   function updateGenerateButton() {
+  async function generateOutfit() {
 
-    const button =
-        document.getElementById("generate-button");
+    const selectedItems =
+        [...selectedIds]
+            .map(id =>
+                items().find(
+                    item =>
+                        item.__backendId === id
+                )
+            )
+            .filter(Boolean);
 
-    if (selectedIds.size > 0) {
+    if (
+        selectedItems.length === 0
+    ) {
 
-        button.classList.remove("hidden");
-
-    } else {
-
-        button.classList.add("hidden");
+        return;
 
     }
+
+    const itemNames =
+        selectedItems
+            .map(item =>
+                item.name
+                    .toLowerCase()
+                    .trim()
+            )
+            .sort();
+
+    const outfitName =
+        itemNames.join("-");
+
+    const transaction =
+        db.transaction(
+            ["outfits"],
+            "readonly"
+        );
+
+    const store =
+        transaction.objectStore(
+            "outfits"
+        );
+
+    const request =
+        store.getAll();
+
+    request.onsuccess =
+        function() {
+
+            const outfits =
+                request.result;
+
+            const found =
+                outfits.find(
+                    outfit =>
+                        outfit.name
+                        === outfitName
+                );
+
+            if (!found) {
+
+                alert(
+                    "No outfit found for: "
+                    + outfitName
+                );
+
+                return;
+
+            }
+
+            document
+                .getElementById(
+                    "generated-image"
+                )
+                .src =
+                    found.image_url;
+
+            document
+                .getElementById(
+                    "generated-name"
+                )
+                .textContent =
+                    selectedItems
+                        .map(
+                            item =>
+                                item.name
+                        )
+                        .join(" + ");
+
+            document
+                .getElementById(
+                    "generated-outfit"
+                )
+                .classList
+                .remove("hidden");
+
+        };
 
 }
 
