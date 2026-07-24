@@ -306,7 +306,10 @@ request.onerror = function() {
 
                     type: "item",
 
-                    name: name,
+                    name:
+    file.name
+        .replace(/\.[^/.]+$/, "")
+        .toLowerCase() ,
 
                     category: category,
 
