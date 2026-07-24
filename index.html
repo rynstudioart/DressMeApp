@@ -135,10 +135,15 @@
   <script src="/_sdk/c939c145c3c74230.editing_sdk.js" integrity="sha512-jh2pv/gl9Gzzn5dxfzwQO4wkqtnAQIim+LIUDYfVu2cdqPkQV2MqbjsDUW5IYbrSZFjRlOBrIWzlvWDXQYxOjg=="></script>
   <script src="/_sdk/935a53bc2e11fb8d.data_sdk.js" integrity="sha512-qr2oyPnEys1WebcOABaRh6hG77r5PWpqeWW6JTKbRJqly/INsfBi31CVNlTmHqjgeLpkVmmHZJUdxSx/32tOFQ=="></script>
   <script>
-        let allData = [];
-        let selectedIds = new Set();
-        let creatingOutfit = false;
 
+let allData = [];
+let selectedIds = new Set();
+let creatingOutfit = false;
+
+
+// ===============================
+// INDEXEDDB - LOCAL STORAGE
+// ===============================
 
 let db;
 
@@ -149,18 +154,23 @@ request.onupgradeneeded = function(event) {
     db = event.target.result;
 
     if (!db.objectStoreNames.contains("wardrobe")) {
+
         db.createObjectStore("wardrobe", {
             keyPath: "id"
         });
+
     }
 
     if (!db.objectStoreNames.contains("outfits")) {
+
         db.createObjectStore("outfits", {
             keyPath: "id"
         });
+
     }
 
 };
+
 
 request.onsuccess = function(event) {
 
@@ -170,13 +180,44 @@ request.onsuccess = function(event) {
 
 };
 
+
 request.onerror = function() {
 
     console.error("IndexedDB error");
 
 };
 
-   function saveWardrobeItem(item) {
+
+// ===============================
+// LOAD LOCAL DATA
+// ===============================
+
+async function loadLocalData() {
+
+    const wardrobeItems =
+        await getWardrobeItems();
+
+    allData =
+        allData.filter(
+            item => item.type !== "item"
+        );
+
+    allData.push(
+        ...wardrobeItems
+    );
+
+    renderWardrobe();
+
+    renderOutfitCollection();
+
+}
+
+
+// ===============================
+// SAVE WARDROBE ITEM
+// ===============================
+
+function saveWardrobeItem(item) {
 
     const transaction =
         db.transaction(
@@ -192,7 +233,13 @@ request.onerror = function() {
     store.put(item);
 
 }
-   function getWardrobeItems() {
+
+
+// ===============================
+// GET WARDROBE ITEMS
+// ===============================
+
+function getWardrobeItems() {
 
     return new Promise((resolve) => {
 
@@ -222,141 +269,217 @@ request.onerror = function() {
     });
 
 }
-   
-        const handler = {
-            onDataChanged(data) {
-                allData = data;
-                renderWardrobe();
-                renderOutfits();
-            }
-        };
 
-        (async () => {
-            const r = await window.dataSdk.init(handler);
-            if (!r.isOk) console.error('SDK init failed');
-            lucide.createIcons();
-        })();
 
-        function items() {
+// ===============================
+// DATA SDK
+// ===============================
 
-  const wardrobeItems = allData.filter(
-    d => d.type === "item"
-  );
+const handler = {
 
-  const defaultDress = {
-    __backendId: "default-dress-1",
-    type: "item",
-    name: "Dress 1",
-    category: "dress",
-    image_url: "dress1.PNG",
-    outfit_items: ""
-  };
+    onDataChanged(data) {
 
-  return [
-    defaultDress,
-    ...wardrobeItems
-  ];
+        allData = data;
+
+        loadLocalData();
+
+        renderOutfits();
+
+    }
+
+};
+
+
+(async () => {
+
+    const r =
+        await window.dataSdk.init(
+            handler
+        );
+
+    if (!r.isOk) {
+
+        console.error(
+            "SDK init failed"
+        );
+
+    }
+
+    lucide.createIcons();
+
+})();
+
+
+// ===============================
+// ITEMS
+// ===============================
+
+function items() {
+
+    const wardrobeItems =
+        allData.filter(
+            d => d.type === "item"
+        );
+
+
+    const defaultDress = {
+
+        __backendId:
+            "default-dress-1",
+
+        type:
+            "item",
+
+        name:
+            "dress1",
+
+        category:
+            "dress",
+
+        image_url:
+            "dress1.PNG",
+
+        outfit_items:
+            ""
+
+    };
+
+
+    return [
+
+        defaultDress,
+
+        ...wardrobeItems
+
+    ];
 
 }
 
-  
-        function outfits() { return allData.filter(d => d.type === 'outfit'); }
 
-        function switchTab(tab) {
-            document.getElementById('view-wardrobe').classList.toggle('hidden', tab !== 'wardrobe');
-            document.getElementById('view-outfits').classList.toggle('hidden', tab !== 'outfits');
-            document.getElementById('tab-wardrobe').classList.toggle('tab-active', tab === 'wardrobe');
-            document.getElementById('tab-outfits').classList.toggle('tab-active', tab === 'outfits');
-        }
+// ===============================
+// OUTFITS
+// ===============================
 
-        function toggleAddForm() {
-            document.getElementById('add-form').classList.toggle('hidden');
-        }
+function outfits() {
 
-        async function addItem(e) {
+    return allData.filter(
+        d => d.type === "outfit"
+    );
+
+}
+
+
+// ===============================
+// SWITCH TABS
+// ===============================
+
+function switchTab(tab) {
+
+    document
+        .getElementById(
+            "view-wardrobe"
+        )
+        .classList
+        .toggle(
+            "hidden",
+            tab !== "wardrobe"
+        );
+
+
+    document
+        .getElementById(
+            "view-outfits"
+        )
+        .classList
+        .toggle(
+            "hidden",
+            tab !== "outfits"
+        );
+
+
+    document
+        .getElementById(
+            "tab-wardrobe"
+        )
+        .classList
+        .toggle(
+            "tab-active",
+            tab === "wardrobe"
+        );
+
+
+    document
+        .getElementById(
+            "tab-outfits"
+        )
+        .classList
+        .toggle(
+            "tab-active",
+            tab === "outfits"
+        );
+
+}
+
+
+// ===============================
+// ADD ITEM FORM
+// ===============================
+
+function toggleAddForm() {
+
+    document
+        .getElementById(
+            "add-form"
+        )
+        .classList
+        .toggle(
+            "hidden"
+        );
+
+}
+
+
+// ===============================
+// UPLOAD WARDROBE ITEMS
+// ===============================
+
+async function addItem(e) {
 
     e.preventDefault();
 
-    const name =
-        document
-        .getElementById("item-name")
-        .value
-        .trim();
 
     const category =
         document
-        .getElementById("item-cat")
-        .value;
+            .getElementById(
+                "item-cat"
+            )
+            .value;
+
 
     const files =
         document
-        .getElementById("item-files")
-        .files;
+            .getElementById(
+                "item-files"
+            )
+            .files;
+
 
     if (
-        !name ||
         files.length === 0
     ) {
+
         return;
+
     }
+
 
     for (
         const file of files
     ) {
 
-        const id =
-            crypto.randomUUID();
-
         const reader =
             new FileReader();
 
-        reader.onload =
-            function(event) {
-
-                const item = {
-
-                    id: id,
-
-                    __backendId: id,
-
-                    type: "item",
-
-                    name:
-    file.name
-        .replace(/\.[^/.]+$/, "")
-        .toLowerCase() ,
-
-                    category: category,
-
-                    image_url:
-                        event.target.result
-
-                };
-
-                saveWardrobeItem(item);
-
-                allData.push(item);
-
-                renderWardrobe();
-
-            };
-
-        reader.readAsDataURL(file);
-
-    }
-
-    e.target.reset();
-
-    toggleAddForm();
-
-} 
-
-   function uploadOutfits(files) {
-
-    [...files].forEach(file => {
-
-        const reader =
-            new FileReader();
 
         reader.onload =
             function(event) {
@@ -364,9 +487,17 @@ request.onerror = function() {
                 const id =
                     crypto.randomUUID();
 
-                const outfit = {
 
-                    id: id,
+                const item = {
+
+                    id:
+                        id,
+
+                    __backendId:
+                        id,
+
+                    type:
+                        "item",
 
                     name:
                         file.name
@@ -376,163 +507,678 @@ request.onerror = function() {
                             )
                             .toLowerCase(),
 
+                    category:
+                        category,
+
                     image_url:
                         event.target.result
 
                 };
 
-                const transaction =
-                    db.transaction(
-                        ["outfits"],
-                        "readwrite"
-                    );
 
-                const store =
-                    transaction.objectStore(
-                        "outfits"
-                    );
+                saveWardrobeItem(
+                    item
+                );
 
-                store.put(outfit);
 
-                renderOutfitCollection();
+                allData.push(
+                    item
+                );
+
+
+                renderWardrobe();
 
             };
 
-        reader.readAsDataURL(file);
 
-    });
+        reader.readAsDataURL(
+            file
+        );
+
+    }
+
+
+    e.target.reset();
+
+    toggleAddForm();
 
 }
 
-        async function deleteRecord(rec) {
-            await window.dataSdk.delete(rec);
-        }
 
-        function renderWardrobe() {
-            const filter = document.getElementById('cat-filter').value;
+// ===============================
+// UPLOAD OUTFIT PHOTOS
+// ===============================
 
-    const list = filter === 'all'
+function uploadOutfits(files) {
 
-        ? items()
+    [...files].forEach(
+        file => {
 
-        : items().filter(i => i.category === filter);
-            const grid = document.getElementById('wardrobe-grid');
-            const empty = document.getElementById('wardrobe-empty');
-            empty.classList.toggle('hidden', list.length > 0);
+            const reader =
+                new FileReader();
 
-            grid.innerHTML = '';
-            list.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'relative rounded-xl overflow-hidden bg-white border group';
-                div.innerHTML = `
-                    <img src="${item.image_url}" alt="${item.name}" class="w-full aspect-square object-contain">
-                    <div class="p-2">
-                        <p class="text-xs font-medium truncate">${item.name}</p>
-                        <p class="text-[10px] text-gray-400 uppercase">${item.category}</p>
-                        <p class="text-[10px] text-gray-500 truncate">${item.category === 'dress' ? 'dress1.PNG' : ''}</p>
-                    </div>
-                    <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${item.__backendId}'))" class="absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
-                `;
-                grid.appendChild(div);
-            });
-            lucide.createIcons();
-        }
 
-        function startOutfitCreation() {
-            creatingOutfit = true;
-            selectedIds.clear();
-            updateOutfitName();
-            document.getElementById('outfit-creator').classList.remove('hidden');
-            renderPicker();
-        }
-        function cancelOutfit() {
-            creatingOutfit = false;
-            document.getElementById('outfit-creator').classList.add('hidden');
-        }
+            reader.onload =
+                function(event) {
 
-        function updateOutfitName() {
-            const name = [...selectedIds].map(id => items().find(item => item.__backendId === id)?.name).filter(Boolean).join('');
-            document.getElementById('outfit-name').value = name;
-        }
+                    const id =
+                        crypto.randomUUID();
 
-        function renderPicker() {
 
-    const picker =
-        document.getElementById('outfit-picker');
+                    const outfit = {
 
-    picker.innerHTML = '';
+                        id:
+                            id,
 
-    items().forEach(item => {
+                        name:
+                            file.name
+                                .replace(
+                                    /\.[^/.]+$/,
+                                    ""
+                                )
+                                .toLowerCase()
+                                .trim(),
 
-        const d =
-            document.createElement('div');
+                        image_url:
+                            event.target.result
 
-        const sel =
-            selectedIds.has(
-                item.__backendId
+                    };
+
+
+                    const transaction =
+                        db.transaction(
+                            ["outfits"],
+                            "readwrite"
+                        );
+
+
+                    const store =
+                        transaction.objectStore(
+                            "outfits"
+                        );
+
+
+                    store.put(
+                        outfit
+                    );
+
+
+                    transaction.oncomplete =
+                        function() {
+
+                            renderOutfitCollection();
+
+                        };
+
+                };
+
+
+            reader.readAsDataURL(
+                file
             );
 
-        d.className =
-            `cursor-pointer rounded-lg overflow-hidden border-2 ${
-                sel
-                    ? 'border-amber-500'
-                    : 'border-transparent'
-            }`;
+        }
+    );
 
-        d.innerHTML = `
-            <img
-                src="${item.image_url}"
-                alt="${item.name}"
-                class="w-full aspect-square object-cover">
-        `;
+}
 
-        d.onclick = () => {
 
-            if (
-                selectedIds.has(
-                    item.__backendId
-                )
-            ) {
+// ===============================
+// RENDER OUTFIT COLLECTION
+// ===============================
 
-                selectedIds.delete(
-                    item.__backendId
-                );
+function renderOutfitCollection() {
 
-            } else {
+    const grid =
+        document.getElementById(
+            "outfits-grid"
+        );
 
-                selectedIds.add(
-                    item.__backendId
-                );
 
-            }
+    if (
+        !grid ||
+        !db
+    ) {
 
-            updateOutfitName();
+        return;
 
-            renderPicker();
+    }
 
-            updateGenerateButton();
+
+    const transaction =
+        db.transaction(
+            ["outfits"],
+            "readonly"
+        );
+
+
+    const store =
+        transaction.objectStore(
+            "outfits"
+        );
+
+
+    const request =
+        store.getAll();
+
+
+    request.onsuccess =
+        function() {
+
+            const localOutfits =
+                request.result;
+
+
+            grid.innerHTML =
+                "";
+
+
+            localOutfits.forEach(
+                outfit => {
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.className =
+                        "bg-white border rounded-xl p-3 space-y-2 relative group";
+
+
+                    div.innerHTML = `
+
+                        <img
+                            src="${outfit.image_url}"
+                            alt="${outfit.name}"
+                            class="w-full aspect-square object-contain rounded-lg bg-gray-50">
+
+                        <p class="font-medium text-sm">
+                            ${outfit.name}
+                        </p>
+
+                        <button
+                            onclick="deleteLocalOutfit('${outfit.id}')"
+                            class="absolute top-2 right-2 bg-white/80 rounded-full p-1">
+
+                            🗑️
+
+                        </button>
+
+                    `;
+
+
+                    grid.appendChild(
+                        div
+                    );
+
+                }
+            );
 
         };
 
-        picker.appendChild(d);
+}
 
-    });
+
+// ===============================
+// DELETE LOCAL OUTFIT
+// ===============================
+
+function deleteLocalOutfit(id) {
+
+    const transaction =
+        db.transaction(
+            ["outfits"],
+            "readwrite"
+        );
+
+
+    const store =
+        transaction.objectStore(
+            "outfits"
+        );
+
+
+    store.delete(
+        id
+    );
+
+
+    transaction.oncomplete =
+        function() {
+
+            renderOutfitCollection();
+
+        };
+
+}
+
+
+// ===============================
+// DELETE RECORD
+// ===============================
+
+async function deleteRecord(rec) {
+
+    if (!rec) {
+
+        return;
+
+    }
+
+
+    await window.dataSdk.delete(
+        rec
+    );
+
+}
+
+
+// ===============================
+// RENDER WARDROBE
+// ===============================
+
+function renderWardrobe() {
+
+    const filter =
+        document
+            .getElementById(
+                "cat-filter"
+            )
+            .value;
+
+
+    const list =
+        filter === "all"
+
+            ? items()
+
+            : items().filter(
+                i =>
+                    i.category === filter
+            );
+
+
+    const grid =
+        document
+            .getElementById(
+                "wardrobe-grid"
+            );
+
+
+    const empty =
+        document
+            .getElementById(
+                "wardrobe-empty"
+            );
+
+
+    empty.classList.toggle(
+        "hidden",
+        list.length > 0
+    );
+
+
+    grid.innerHTML =
+        "";
+
+
+    list.forEach(
+        item => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "relative rounded-xl overflow-hidden bg-white border group";
+
+
+            div.innerHTML = `
+
+                <img
+                    src="${item.image_url}"
+                    alt="${item.name}"
+                    class="w-full aspect-square object-contain bg-gray-50">
+
+                <div class="p-2">
+
+                    <p class="text-xs font-medium truncate">
+                        ${item.name}
+                    </p>
+
+                    <p class="text-[10px] text-gray-400 uppercase">
+                        ${item.category}
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="deleteRecord(allData.find(d => d.__backendId === '${item.__backendId}'))"
+                    class="absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition">
+
+                    🗑️
+
+                </button>
+
+            `;
+
+
+            grid.appendChild(
+                div
+            );
+
+        }
+    );
+
+
+    lucide.createIcons();
+
+}
+
+
+// ===============================
+// NEW OUTFIT
+// ===============================
+
+function startOutfitCreation() {
+
+    creatingOutfit =
+        true;
+
+
+    selectedIds.clear();
+
+
+    updateOutfitName();
+
+
+    document
+        .getElementById(
+            "outfit-creator"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+
+    renderPicker();
+
+}
+
+
+// ===============================
+// CANCEL
+// ===============================
+
+function cancelOutfit() {
+
+    creatingOutfit =
+        false;
+
+
+    document
+        .getElementById(
+            "outfit-creator"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+}
+
+
+// ===============================
+// OUTFIT NAME
+// ===============================
+
+function updateOutfitName() {
+
+    const name =
+
+        [...selectedIds]
+
+            .map(
+                id =>
+                    items()
+                        .find(
+                            item =>
+                                item.__backendId === id
+                        )
+                        ?.name
+            )
+
+            .filter(Boolean)
+
+            .join("-");
+
+
+    document
+        .getElementById(
+            "outfit-name"
+        )
+        .value =
+            name;
+
+}
+
+
+// ===============================
+// PICKER
+// ===============================
+
+function renderPicker() {
+
+    const picker =
+        document
+            .getElementById(
+                "outfit-picker"
+            );
+
+
+    picker.innerHTML =
+        "";
+
+
+    items().forEach(
+        item => {
+
+            const d =
+                document.createElement(
+                    "div"
+                );
+
+
+            const sel =
+                selectedIds.has(
+                    item.__backendId
+                );
+
+
+            d.className =
+
+                `cursor-pointer rounded-lg overflow-hidden border-2 ${
+                    sel
+                        ? "border-amber-500"
+                        : "border-transparent"
+                }`;
+
+
+            d.innerHTML = `
+
+                <img
+                    src="${item.image_url}"
+                    alt="${item.name}"
+                    class="w-full aspect-square object-contain bg-gray-50">
+
+            `;
+
+
+            d.onclick =
+                () => {
+
+                    if (
+                        selectedIds.has(
+                            item.__backendId
+                        )
+                    ) {
+
+                        selectedIds.delete(
+                            item.__backendId
+                        );
+
+                    }
+
+                    else {
+
+                        selectedIds.add(
+                            item.__backendId
+                        );
+
+                    }
+
+
+                    updateOutfitName();
+
+                    renderPicker();
+
+                    updateGenerateButton();
+
+                };
+
+
+            picker.appendChild(
+                d
+            );
+
+        }
+    );
+
 
     updateGenerateButton();
 
 }
 
-  async function generateOutfit() {
+
+// ===============================
+// GENERATE BUTTON
+// ===============================
+
+function updateGenerateButton() {
+
+    const button =
+        document.getElementById(
+            "generate-button"
+        );
+
+
+    if (
+        selectedIds.size > 0
+    ) {
+
+        button.classList.remove(
+            "hidden"
+        );
+
+    }
+
+    else {
+
+        button.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+// ===============================
+// SAVE OUTFIT
+// ===============================
+
+async function saveOutfit() {
+
+    const name =
+        document
+            .getElementById(
+                "outfit-name"
+            )
+            .value
+            .trim();
+
+
+    if (
+        !name ||
+        selectedIds.size === 0
+    ) {
+
+        return;
+
+    }
+
+
+    await window.dataSdk.create({
+
+        type:
+            "outfit",
+
+        name:
+            name,
+
+        category:
+            "",
+
+        image_url:
+            "",
+
+        outfit_items:
+            [
+                ...selectedIds
+            ]
+            .join(",")
+
+    });
+
+
+    document
+        .getElementById(
+            "outfit-name"
+        )
+        .value =
+            "";
+
+
+    cancelOutfit();
+
+}
+
+
+// ===============================
+// GENERATE OUTFIT
+// ===============================
+
+async function generateOutfit() {
 
     const selectedItems =
+
         [...selectedIds]
-            .map(id =>
-                items().find(
-                    item =>
-                        item.__backendId === id
-                )
+
+            .map(
+                id =>
+                    items()
+                        .find(
+                            item =>
+                                item.__backendId === id
+                        )
             )
+
             .filter(Boolean);
+
 
     if (
         selectedItems.length === 0
@@ -542,17 +1188,24 @@ request.onerror = function() {
 
     }
 
+
     const itemNames =
+
         selectedItems
-            .map(item =>
-                item.name
-                    .toLowerCase()
-                    .trim()
+
+            .map(
+                item =>
+                    item.name
+                        .toLowerCase()
+                        .trim()
             )
+
             .sort();
+
 
     const outfitName =
         itemNames.join("-");
+
 
     const transaction =
         db.transaction(
@@ -560,26 +1213,31 @@ request.onerror = function() {
             "readonly"
         );
 
+
     const store =
         transaction.objectStore(
             "outfits"
         );
 
+
     const request =
         store.getAll();
+
 
     request.onsuccess =
         function() {
 
-            const outfits =
+            const localOutfits =
                 request.result;
 
+
             const found =
-                outfits.find(
+                localOutfits.find(
                     outfit =>
                         outfit.name
                         === outfitName
                 );
+
 
             if (!found) {
 
@@ -592,6 +1250,7 @@ request.onerror = function() {
 
             }
 
+
             document
                 .getElementById(
                     "generated-image"
@@ -599,134 +1258,57 @@ request.onerror = function() {
                 .src =
                     found.image_url;
 
+
             document
                 .getElementById(
                     "generated-name"
                 )
                 .textContent =
+
                     selectedItems
+
                         .map(
                             item =>
                                 item.name
                         )
-                        .join(" + ");
+
+                        .join(
+                            " + "
+                        );
+
 
             document
                 .getElementById(
                     "generated-outfit"
                 )
                 .classList
-                .remove("hidden");
+                .remove(
+                    "hidden"
+                );
 
         };
 
 }
 
-        async function saveOutfit() {
-            const name = document.getElementById('outfit-name').value.trim();
-            if (!name || selectedIds.size === 0) return;
-            await window.dataSdk.create({ type: 'outfit', name, category: '', image_url: '', outfit_items: [...selectedIds].join(',') });
-            document.getElementById('outfit-name').value = '';
-            cancelOutfit();
-        }
-   function generateOutfit() {
 
-    const selectedItems =
-        [...selectedIds]
-            .map(id =>
-                items().find(
-                    item =>
-                        item.__backendId === id
-                )
-            )
-            .filter(Boolean);
+// ===============================
+// RENDER SAVED OUTFITS
+// ===============================
 
+function renderOutfits() {
 
-    if (selectedItems.length === 0) {
-        return;
-    }
+    // Outfiturile create prin
+    // New Outfit sunt gestionate
+    // de Data SDK.
 
+    // Outfiturile încărcate din SD card
+    // sunt gestionate de IndexedDB.
 
-    // Get selected file names
-    const selectedImages =
-        selectedItems.map(
-            item =>
-                item.image_url
-                    .split("/")
-                    .pop()
-                    .toLowerCase()
-        );
-
-
-    let generatedImage = "";
-
-
-    // DRESS 1 + BAG 1
-    if (
-        selectedImages.includes("dress1.png") &&
-        selectedImages.includes("bag1.png")
-    ) {
-
-        generatedImage =
-            "./outfit2.jpg";
-
-    }
-
-
-    // ONLY DRESS 1
-    else if (
-        selectedImages.includes("dress1.png")
-    ) {
-
-        generatedImage =
-            "./dress1.jpg";
-
-    }
-
-
-    // Show generated image
-    document
-        .getElementById("generated-image")
-        .src = generatedImage;
-
-
-    // Show outfit name
-    document
-        .getElementById("generated-name")
-        .textContent =
-            selectedItems
-                .map(item => item.name)
-                .join(" + ");
-
-
-    // Show generated outfit section
-    document
-        .getElementById("generated-outfit")
-        .classList
-        .remove("hidden");
+    // Colecția locală este afișată
+    // prin renderOutfitCollection().
 
 }
 
-        function renderOutfits() {
-            const list = outfits();
-            const grid = document.getElementById('outfits-grid');
-            const empty = document.getElementById('outfits-empty');
-            empty.classList.toggle('hidden', list.length > 0);
-            grid.innerHTML = '';
-            list.forEach(o => {
-                const ids = o.outfit_items ? o.outfit_items.split(',') : [];
-                const oItems = ids.map(id => allData.find(d => d.__backendId === id)).filter(Boolean);
-                const div = document.createElement('div');
-                div.className = 'bg-white border rounded-xl p-3 space-y-2 relative group';
-                div.innerHTML = `
-                    <p class="font-medium text-sm">${o.name}</p>
-                    <div class="flex gap-1 flex-wrap">${oItems.map(i => `<div class="text-center"><img src="${i.image_url}" alt="${i.name}" class="w-12 h-12 rounded object-cover"><span class="block text-[10px] text-gray-500">${i.category === 'dress' ? 'dress1.jpg' : ''}</span></div>`).join('')}</div>
-                    <button onclick="deleteRecord(allData.find(d=>d.__backendId==='${o.__backendId}'))" class="absolute top-2 right-2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" style="width:14px;height:14px;color:#ef4444"></i></button>
-                `;
-                grid.appendChild(div);
-            });
-            lucide.createIcons();
-        }
-    </script>
+</script>
  </body>
 </html>
