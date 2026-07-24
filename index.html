@@ -857,7 +857,7 @@ function renderWardrobe() {
                 </div>
 
                 <button
-                    onclick="deleteRecord(allData.find(d => d.__backendId === '${item.__backendId}'))"
+                    onclick="deleteWardrobeItem('${item.id || item.__backendId}')"
                     class="absolute top-1 right-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition">
 
                     🗑️
