@@ -316,42 +316,9 @@ const handler = {
 
 function items() {
 
-    const wardrobeItems =
-        allData.filter(
-            d => d.type === "item"
-        );
-
-
-    const defaultDress = {
-
-        __backendId:
-            "default-dress-1",
-
-        type:
-            "item",
-
-        name:
-            "dress1",
-
-        category:
-            "dress",
-
-        image_url:
-            "dress1.PNG",
-
-        outfit_items:
-            ""
-
-    };
-
-
-    return [
-
-        defaultDress,
-
-        ...wardrobeItems
-
-    ];
+    return allData.filter(
+        d => d.type === "item"
+    );
 
 }
 
