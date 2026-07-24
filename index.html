@@ -42,7 +42,14 @@
      <select id="cat-filter" class="border rounded px-3 py-2 text-sm" onchange="renderWardrobe()"> <option value="all">All</option> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <button onclick="toggleAddForm()" class="ml-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i data-lucide="plus" style="width:16px;height:16px"></i> Add Item</button>
     </div>
     <form id="add-form" class="hidden bg-gray-50 rounded-xl p-4 mb-4 space-y-3" onsubmit="addItem(event)">
-     <label for="item-name" class="text-sm font-medium">Name</label> <input id="item-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm"> <label for="item-cat" class="text-sm font-medium">Category</label> <select id="item-cat" required class="w-full border rounded-lg px-3 py-2 text-sm"> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <label for="item-url" class="text-sm font-medium">Image URL (GitHub raw)</label> <input id="item-url" type="url" required placeholder="https://raw.githubusercontent.com/..." class="w-full border rounded-lg px-3 py-2 text-sm">
+     <label for="item-name" class="text-sm font-medium">Name</label> <input id="item-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm"> <label for="item-cat" class="text-sm font-medium">Category</label> <select id="item-cat" required class="w-full border rounded-lg px-3 py-2 text-sm"> <option value="tops">Tops</option> <option value="bottoms">Bottoms</option> <option value="dress">Dress</option> <option value="skirt">Skirt</option> <option value="short pants">Short Pants</option> <option value="shoes">Shoes</option> <option value="accessories">Accessories</option> <option value="outerwear">Outerwear</option> </select> <label for="item-files" class="text-sm font-medium">Upload Photos</label>
+
+<input
+    id="item-files"
+    type="file"
+    accept="image/*"
+    multiple
+    class="w-full border rounded-lg px-3 py-2 text-sm">
      <div class="flex gap-2">
       <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">Save</button> <button type="button" onclick="toggleAddForm()" class="px-4 py-2 rounded-lg text-sm border">Cancel</button>
      </div>
