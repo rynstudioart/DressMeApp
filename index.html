@@ -124,6 +124,90 @@
         let selectedIds = new Set();
         let creatingOutfit = false;
 
+
+let db;
+
+const request = indexedDB.open("DressMeDB", 1);
+
+request.onupgradeneeded = function(event) {
+
+    db = event.target.result;
+
+    if (!db.objectStoreNames.contains("wardrobe")) {
+        db.createObjectStore("wardrobe", {
+            keyPath: "id"
+        });
+    }
+
+    if (!db.objectStoreNames.contains("outfits")) {
+        db.createObjectStore("outfits", {
+            keyPath: "id"
+        });
+    }
+
+};
+
+request.onsuccess = function(event) {
+
+    db = event.target.result;
+
+    loadLocalData();
+
+};
+
+request.onerror = function() {
+
+    console.error("IndexedDB error");
+
+};
+
+   function saveWardrobeItem(item) {
+
+    const transaction =
+        db.transaction(
+            ["wardrobe"],
+            "readwrite"
+        );
+
+    const store =
+        transaction.objectStore(
+            "wardrobe"
+        );
+
+    store.put(item);
+
+}
+   function getWardrobeItems() {
+
+    return new Promise((resolve) => {
+
+        const transaction =
+            db.transaction(
+                ["wardrobe"],
+                "readonly"
+            );
+
+        const store =
+            transaction.objectStore(
+                "wardrobe"
+            );
+
+        const request =
+            store.getAll();
+
+        request.onsuccess =
+            function() {
+
+                resolve(
+                    request.result
+                );
+
+            };
+
+    });
+
+}
+   
         const handler = {
             onDataChanged(data) {
                 allData = data;
@@ -175,14 +259,79 @@
         }
 
         async function addItem(e) {
-            e.preventDefault();
-            const name = document.getElementById('item-name').value.trim();
-            const category = document.getElementById('item-cat').value;
-            const image_url = document.getElementById('item-url').value.trim();
-            if (!name || !image_url) return;
-            const r = await window.dataSdk.create({ type: 'item', name, category, image_url, outfit_items: '' });
-            if (r.isOk) { e.target.reset(); toggleAddForm(); }
-        }
+
+    e.preventDefault();
+
+    const name =
+        document
+        .getElementById("item-name")
+        .value
+        .trim();
+
+    const category =
+        document
+        .getElementById("item-cat")
+        .value;
+
+    const files =
+        document
+        .getElementById("item-files")
+        .files;
+
+    if (
+        !name ||
+        files.length === 0
+    ) {
+        return;
+    }
+
+    for (
+        const file of files
+    ) {
+
+        const id =
+            crypto.randomUUID();
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function(event) {
+
+                const item = {
+
+                    id: id,
+
+                    __backendId: id,
+
+                    type: "item",
+
+                    name: name,
+
+                    category: category,
+
+                    image_url:
+                        event.target.result
+
+                };
+
+                saveWardrobeItem(item);
+
+                allData.push(item);
+
+                renderWardrobe();
+
+            };
+
+        reader.readAsDataURL(file);
+
+    }
+
+    e.target.reset();
+
+    toggleAddForm();
+
+}
 
         async function deleteRecord(rec) {
             await window.dataSdk.delete(rec);
